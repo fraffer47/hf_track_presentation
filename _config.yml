@@ -1,7 +1,3 @@
 title: HFTrack
 description: Mobile Frontend Prototype for Heart Failure Monitoring
-
-theme: jekyll-theme-cayman
-
-github:
-  is_project_page: true
+markdown: kramdown
