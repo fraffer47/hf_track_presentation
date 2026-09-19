@@ -1,63 +1,37 @@
-# ❤️ HFTrack - Mobile Frontend Prototype for Heart Failure Monitoring
+# ❤️ HFTrack
+
+### Mobile Frontend Prototype for Heart Failure Monitoring
 
 HFTrack is a **Flutter mobile frontend prototype for patients**, developed as part of a bachelor's thesis on remote monitoring systems for heart failure. It integrates a **Movesense MD sensor** through **Bluetooth Low Energy (BLE)** to acquire and display heart rate and electrocardiogram data in real time.
 
 The application also provides a patient-oriented dashboard for body weight, blood pressure, and oxygen saturation. These three parameters are simulated in the current prototype.
 
-🔗 **Repository:** [UniSalento-IDALab-Bachelor-Thesis/tesi-hftrack-FrancescoFerraro](https://github.com/UniSalento-IDALab-Bachelor-Thesis/tesi-hftrack-FrancescoFerraro)
+🔗 **Main repository:** [UniSalento-IDALab-Bachelor-Thesis/tesi-hftrack-FrancescoFerraro](https://github.com/UniSalento-IDALab-Bachelor-Thesis/tesi-hftrack-FrancescoFerraro)
 
 > **Important:** HFTrack is an academic prototype. It is not a certified medical device and must not be used for diagnosis, treatment decisions, or emergency monitoring.
 
 ---
 
-## 🏥 Overall System Architecture
+## 📱 Application Preview
 
-The mobile prototype is designed as one component of a broader conceptual architecture for the remote monitoring of patients with heart failure.
+<p align="center">
+  <img src="docs/hftrack-connected.jpg" alt="HFTrack dashboard with Movesense sensor connected and live ECG" width="360">
+</p>
 
-![Overall architecture for remote heart failure monitoring](docs/architettura_sistema.png)
-
-The complete architecture is divided into four main areas:
-
-1. **Patient and data acquisition:** the Movesense MD wearable continuously acquires ECG and heart-rate data, while body weight, blood pressure, and SpO₂ are entered manually by the patient.
-2. **Mobile gateway:** the patient's smartphone runs the Flutter application, receives wearable data over BLE, validates manual inputs, manages local state, and acts as the bridge towards remote services.
-3. **Cloud infrastructure:** the proposed architecture includes MQTT and REST communication, a clinical database, and predictive AI models for persistence and analysis.
-4. **Clinical layer:** a dedicated dashboard would allow healthcare professionals to inspect patient trends and receive alerts.
-
-### Implemented scope
-
-This repository implements **only the patient-side mobile frontend prototype**, represented by the Flutter application inside the mobile gateway.
-
-The following elements belong to the overall proposed architecture but are **not implemented in this repository**:
-
-* cloud backend services;
-* MQTT telemetry and remote REST APIs;
-* clinical database persistence;
-* predictive AI services;
-* healthcare-professional dashboard;
-* end-to-end patient authentication and remote clinical workflows.
-
-The repository therefore demonstrates local acquisition, presentation, validation, recording, and interaction workflows on the patient's smartphone. It provides a foundation for future integration into the complete telemonitoring architecture.
+The patient dashboard brings the main monitored parameters into a single mobile interface. When a Movesense sensor is connected, HFTrack displays the current **heart rate** together with a **live ECG trace**, while also providing access to body weight, blood pressure, and oxygen saturation data.
 
 ---
 
-## 📌 Frontend Prototype Overview
+## 🎥 Demo
 
-The implemented goal is to demonstrate how a Flutter frontend can communicate with a wearable physiological sensor and present heterogeneous health information through a single accessible mobile interface.
+A short recording of the prototype is included in this presentation repository:
 
-Unlike browser-based solutions that access BLE characteristics directly through the Web Bluetooth API, HFTrack uses the **Movesense Device Service (MDS)** and the **Whiteboard resource model**. The smartphone acts as the client: it connects to the sensor and subscribes to resources exposed by the Movesense device.
+[**▶️ Watch the HFTrack demo**](docs/hftrack-demo.mp4)
 
-The main Movesense resources used by the frontend are:
-
-```text
-/Meas/HR
-/Meas/ECG/256
-```
-
-The ECG resource provides data sampled at **256 Hz**. MDS transports the Whiteboard messages over BLE and delivers the received measurements to the Flutter application through the `mdsflutter` plugin.
 
 ---
 
-## 🚀 Implemented Features
+## 🚀 Main Features
 
 * 🔍 Discovery of nearby Movesense devices over BLE
 * 🔗 Connection and disconnection management
@@ -75,28 +49,100 @@ The ECG resource provides data sampled at **256 Hz**. MDS transports the Whitebo
 
 ---
 
-## 🧪 Prototype and Simulated Data
+## ❤️ Real-Time ECG Monitoring
 
-Only the following measurements are acquired from the physical Movesense sensor:
+HFTrack uses the **Movesense Device Service (MDS)** and the **Whiteboard resource model** to communicate with the wearable sensor. The smartphone acts as the client and receives physiological measurements locally over BLE.
 
-* heart rate;
-* ECG samples.
-
-The values used for **body weight**, **blood pressure**, and **SpO₂** are simulated for demonstration purposes. They are defined in the project's `mocks` directory and are not collected from real medical devices or external services.
+The main Movesense resources used by the frontend are:
 
 ```text
-lib/
-└── data/
-    └── mocks/
+/Meas/HR
+/Meas/ECG/256
 ```
 
-The simulated records allow the user interface, charts, data-entry flows, and alert logic to be demonstrated without requiring additional hardware.
+The ECG resource provides data sampled at **256 Hz**. Once the sensor is connected, the application presents the current heart rate and continuously updates the ECG chart.
+
+<p align="center">
+  <img src="docs/hftrack-connected.jpg" alt="Live ECG and heart rate in HFTrack" width="360">
+</p>
+
+---
+
+## 📄 ECG Recording and PDF Export
+
+The user can manually start and stop an ECG recording while the sensor is connected. Recorded samples are kept separately from the short buffer used for the live chart.
+
+After stopping the recording, HFTrack can generate a landscape PDF containing the sensor and recording information together with consecutive ECG strips arranged across multiple rows and pages.
+
+<p align="center">
+  <img src="docs/ecg-pdf-preview.png" alt="Example of an ECG recording exported by HFTrack" width="100%">
+</p>
+
+The exported document contains:
+
+* sensor identifier;
+* user age and sex;
+* sampling frequency;
+* start and end time;
+* recording duration;
+* consecutive ECG strips.
+
+The generated document can be saved or shared through the operating system. Recordings are not stored in a permanent in-app archive.
+
+---
+
+## 📡 Bluetooth and Connection States
+
+The interface reflects the availability and connection state of the Movesense sensor. HFTrack handles BLE discovery, connection and disconnection, Android runtime permissions, and Bluetooth availability.
+
+<p align="center">
+  <img src="docs/hftrack-bluetooth-disabled.jpg" alt="HFTrack interface when Bluetooth is disabled" width="360">
+</p>
+
+When Bluetooth is unavailable, the dashboard communicates the problem directly to the user and prevents sensor-dependent measurements from being displayed.
+
+---
+
+## 📊 Patient Health Dashboard
+
+Only **heart rate** and **ECG samples** are acquired from the physical Movesense sensor.
+
+| Parameter | Source |
+|---|---|
+| ❤️ Heart rate | Movesense MD sensor |
+| 📈 ECG | Movesense MD sensor |
+| ⚖️ Body weight | Simulated data |
+| 🩺 Blood pressure | Simulated data |
+| 🫁 Oxygen saturation (SpO₂) | Simulated data |
+
+The simulated weight, blood pressure, and SpO₂ records allow the user interface, charts, data-entry flows, and alert logic to be demonstrated without requiring additional hardware.
+
+---
+
+## 🏥 Overall System Architecture
+
+The mobile prototype is designed as one component of a broader conceptual architecture for the remote monitoring of patients with heart failure.
+
+<p align="center">
+  <img src="docs/architettura_sistema.png" alt="Overall architecture for remote heart failure monitoring" width="100%">
+</p>
+
+The complete proposed architecture is divided into four main areas:
+
+1. **Patient and data acquisition:** the Movesense MD wearable acquires ECG and heart-rate data, while body weight, blood pressure, and SpO₂ are entered manually by the patient.
+2. **Mobile gateway:** the patient's smartphone runs the Flutter application, receives wearable data over BLE, validates manual inputs, manages local state, and acts as the bridge towards remote services.
+3. **Cloud infrastructure:** the proposed architecture includes MQTT and REST communication, a clinical database, and predictive AI models for persistence and analysis.
+4. **Clinical layer:** a dedicated dashboard would allow healthcare professionals to inspect patient trends and receive alerts.
+
+### Implemented scope
+
+This project implements **only the patient-side mobile frontend prototype**. Cloud backend services, MQTT telemetry, remote REST APIs, clinical database persistence, predictive AI services, the healthcare-professional dashboard, and end-to-end remote clinical workflows belong to the broader proposed architecture and are not implemented in the prototype.
 
 ---
 
 ## 🏗️ Frontend Software Architecture
 
-The frontend project follows an **MVVM-inspired architecture** and uses `Provider` for state management.
+The frontend follows an **MVVM-inspired architecture** and uses `Provider` for state management.
 
 ```text
 Views and widgets
@@ -106,7 +152,7 @@ ViewModels
 Movesense / mock data sources
 ```
 
-The principal responsibilities are divided as follows:
+The main responsibilities are divided between:
 
 * **Views:** dashboard, cards, charts, forms, and user interactions;
 * **ViewModels:** application state, BLE workflow, sensor subscriptions, profile data, health records, and ECG recording state;
@@ -120,20 +166,22 @@ The UI components are additionally organized according to **Atomic Design princi
 
 ## 🛠️ Technologies Used
 
-* **Flutter and Dart** for the mobile application
-* **Provider** for state management
-* **flutter_blue_plus** for BLE discovery and adapter checks
-* **mdsflutter** for communication with Movesense MDS/Whiteboard resources
-* **fl_chart** for live charts and health-data visualization
-* **permission_handler** for Android runtime permissions
-* **pdf** and **printing** for ECG document generation and sharing
-* **google_fonts** for UI typography
+| Area | Technologies |
+|---|---|
+| Mobile application | Flutter, Dart |
+| State management | Provider |
+| BLE discovery | flutter_blue_plus |
+| Movesense communication | mdsflutter, MDS / Whiteboard |
+| Charts | fl_chart |
+| Android permissions | permission_handler |
+| ECG document generation | pdf, printing |
+| Typography | google_fonts |
 
 ---
 
 ## 🔗 Movesense Communication Flow
 
-HFTrack does not use HTTP to receive sensor measurements. Communication occurs locally over BLE.
+HFTrack does not use HTTP to receive sensor measurements. Communication with the wearable occurs locally over BLE.
 
 ```text
 Flutter UI
@@ -149,128 +197,14 @@ Bluetooth Low Energy
 Movesense Whiteboard resources
 ```
 
-The application first scans for the sensor and obtains its BLE address. After the MDS connection is established, it subscribes to the required resources:
-
-```dart
-Mds.subscribe(
-  Mds.createSubscriptionUri(serial, "/Meas/ECG/256"),
-  "{}",
-  onSuccess,
-  onError,
-  onNotification,
-  onSubscriptionError,
-);
-```
-
-The Movesense sensor groups acquired samples into messages and sends them to the smartphone through BLE notifications. The application decodes the received event and updates its state and charts.
+The application scans for the sensor, obtains its BLE address, establishes the MDS connection, and subscribes to the required measurement resources. Received events are decoded by the application and used to update its state and charts.
 
 ---
 
-## 📄 ECG Recording and PDF Export
+## 🔒 Prototype Limitations
 
-When the sensor is connected, the user can start and stop an ECG recording manually. Recorded samples are kept separately from the short buffer used by the live chart.
-
-After stopping the recording, the application can generate a landscape PDF containing:
-
-* sensor identifier;
-* user age and sex;
-* sampling frequency;
-* start and end time;
-* recording duration;
-* consecutive ECG strips arranged across multiple rows and pages.
-
-The generated document can be saved or shared through the operating system. Recordings are not stored in a permanent in-app archive.
-
----
-
-## 📱 Requirements
-
-* Flutter SDK compatible with the project's Dart SDK constraint
-* Android Studio or another Flutter-compatible development environment
-* A physical Android device with BLE support
-* A Movesense MD sensor
-* Bluetooth and location services enabled on the Android device
-* The native Movesense MDS Android library required by `mdsflutter`
-
-BLE sensor testing should be performed on a physical device rather than an Android emulator.
-
----
-
-## ⚙️ Android and MDS Setup
-
-The project requires the native Movesense Android library used by `mdsflutter`. If the `.aar` file is not included in the repository, place the required MDS release inside:
-
-```text
-android/libs/
-```
-
-Ensure that the project-level Gradle configuration includes this directory as a flat-file repository:
-
-```kotlin
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-        flatDir {
-            dirs("${rootProject.projectDir}/libs")
-        }
-    }
-}
-```
-
-The Android manifest must include the permissions required for BLE scanning and connection. On recent Android versions, these include `BLUETOOTH_SCAN` and `BLUETOOTH_CONNECT`; location permission is retained for compatibility with older Android BLE scanning behavior.
-
----
-
-## ▶️ How to Run
-
-1. Clone the repository:
-
-```bash
-git clone https://github.com/UniSalento-IDALab-Bachelor-Thesis/tesi-hftrack-FrancescoFerraro.git
-cd tesi-hftrack-FrancescoFerraro
-```
-
-2. Install the Flutter dependencies:
-
-```bash
-flutter pub get
-```
-
-3. Verify that the required MDS `.aar` library and Android Gradle configuration are present.
-4. Connect a physical Android device and check the Flutter environment:
-
-```bash
-flutter doctor
-flutter devices
-```
-
-5. Run the application:
-
-```bash
-flutter run
-```
-
-6. Turn on the Movesense sensor, enable Bluetooth and location on the smartphone, and use the connection control in the ECG card.
-
-To create a release APK:
-
-```bash
-flutter build apk --release
-```
-
-The generated APK is normally available under:
-
-```text
-build/app/outputs/flutter-apk/app-release.apk
-```
-
----
-
-## 🔒 Limitations
-
-* The application is a prototype and is not intended for clinical use.
-* Weight, blood pressure, and SpO₂ data are simulated in the `mocks` directory.
+* HFTrack is an academic prototype and is not intended for clinical use.
+* Weight, blood pressure, and SpO₂ data are simulated.
 * ECG quality depends on correct sensor placement and electrode contact.
 * BLE availability and stability can vary between Android devices.
 * The project currently targets Android because the native MDS setup is platform-specific.
@@ -290,6 +224,14 @@ The work studies remote patient monitoring for heart failure and implements the 
 
 ---
 
+## 🔗 Complete Project Repository
+
+The complete implementation, setup instructions, and technical documentation are available in the main thesis repository:
+
+[**UniSalento-IDALab-Bachelor-Thesis/tesi-hftrack-FrancescoFerraro**](https://github.com/UniSalento-IDALab-Bachelor-Thesis/tesi-hftrack-FrancescoFerraro)
+
+---
+
 ## 👤 Author
 
-**Francesco Ferraro** - *Bachelor's Degree Thesis, University of Salento*
+**Francesco Ferraro** — *Bachelor's Degree Thesis, University of Salento*
